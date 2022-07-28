@@ -1,0 +1,33 @@
+# Pytorch-Scarf
+
+Implementation of [SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption](https://arxiv.org/abs/2106.15147) in Pytorch.
+
+# Install
+
+# Usage
+
+# Parameters
+
+# SCARF
+
+# Citations
+
+```
+@misc{https://doi.org/10.48550/arxiv.2106.15147,
+  doi = {10.48550/ARXIV.2106.15147},
+
+  url = {https://arxiv.org/abs/2106.15147},
+
+  author = {Bahri, Dara and Jiang, Heinrich and Tay, Yi and Metzler, Donald},
+
+  keywords = {Machine Learning (cs.LG), Artificial Intelligence (cs.AI), FOS: Computer and information sciences, FOS: Computer and information sciences},
+
+  title = {SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption},
+
+  publisher = {arXiv},
+
+  year = {2021},
+
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+```

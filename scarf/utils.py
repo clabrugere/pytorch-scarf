@@ -5,14 +5,12 @@ import torch
 from tqdm.auto import tqdm
 
 
-def train_epoch(
-    model, criterion, device, train_loader, optimizer, epoch, log_interval=1000
-):
+def train_epoch(model, criterion, device, train_loader, optimizer, epoch):
     model.train()
     epoch_loss = 0.0
     batch = tqdm(train_loader, desc=f"Epoch {epoch}")
 
-    for batch_idx, (input, target) in enumerate(batch):
+    for input, target in batch:
         input, _ = input.to(device), target.to(device)
 
         # reset gradients
