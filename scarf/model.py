@@ -9,13 +9,9 @@ class MLP(torch.nn.Sequential):
         layers = []
         in_dim = input_dim
         for _ in range(n_layers - 1):
-            layers.extend(
-                [
-                    torch.nn.Linear(in_dim, hidden_dim),
-                    nn.ReLU(inplace=True),
-                    torch.nn.Dropout(dropout),
-                ]
-            )
+            layers.append(torch.nn.Linear(in_dim, hidden_dim))
+            layers.append(nn.ReLU(inplace=True))
+            layers.append(torch.nn.Dropout(dropout))
             in_dim = hidden_dim
 
         layers.extend([torch.nn.Linear(in_dim, hidden_dim), torch.nn.Dropout(dropout)])
@@ -24,19 +20,28 @@ class MLP(torch.nn.Sequential):
 
 
 class SCARF(nn.Module):
-    def __init__(self, input_dim, hidden_size, low, high, corruption_rate=0.6):
+    def __init__(
+        self,
+        input_dim,
+        emb_dim,
+        marginals_min,
+        marginals_max,
+        encoder_depth=4,
+        head_depth=2,
+        corruption_rate=0.6,
+    ):
         super().__init__()
 
-        self.encoder = MLP(input_dim, hidden_size, 4)
-        self.pretraining_head = MLP(hidden_size, hidden_size, 2)
+        self.encoder = MLP(input_dim, emb_dim, encoder_depth)
+        self.pretraining_head = MLP(emb_dim, emb_dim, head_depth)
 
         # initialize weights
         self.encoder.apply(self._init_weights)
         self.pretraining_head.apply(self._init_weights)
 
         # uniform distribution over marginal distributions of dataset's features
-        self._marginals = Uniform(low, high)
-        self._q = int(corruption_rate * input_dim)
+        self._marginals = Uniform(marginals_min, marginals_max)
+        self.corruption_len = int(corruption_rate * input_dim)
 
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
@@ -47,15 +52,15 @@ class SCARF(nn.Module):
         # x: (batch size, m)
         batch_size, m = x.size()
 
-        # create a mask size (batch size, m) where for each sample we set jth column
-        # to True randomly so that n_corrupted / m = q
-        # create a random tensor of size (batch size, m) drawn from the uniform
+        # 1: create a mask of size (batch size, m) where for each sample we set the jth column
+        # to True at random, such that corruption_len / m = corruption_rate
+        # 2: create a random tensor of size (batch size, m) drawn from the uniform
         # distribution defined by the min, max values of the marginals of the traning set
-        # replace x_c_ij by r_ij where mask_ij is true
+        # 3: replace x_corrupted_ij by x_random_ij where mask_ij is true
 
         corruption_mask = torch.zeros_like(x, dtype=torch.bool)
         for i in range(batch_size):
-            corruption_idx = torch.randperm(m)[: self._q]
+            corruption_idx = torch.randperm(m)[: self.corruption_len]
             corruption_mask[i, corruption_idx] = True
 
         x_random = self._marginals.sample((batch_size,))
