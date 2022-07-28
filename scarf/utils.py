@@ -1,6 +1,5 @@
 import random
 
-import numpy as np
 import torch
 from tqdm.auto import tqdm
 
@@ -37,6 +36,5 @@ def train_epoch(model, criterion, device, train_loader, optimizer, epoch):
 
 def fix_seed(seed):
     random.seed(seed)
-    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
