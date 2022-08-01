@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name="scarf",
+    name="pytorch-scarf",
     packages=["scarf"],
     version="0.1",
     license="MIT",
