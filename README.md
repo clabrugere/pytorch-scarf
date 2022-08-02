@@ -6,6 +6,14 @@ The model learns a representation of tabular data using contrastive learning. It
 
 # Install
 
+Clone the repo
+
+```git clone https://github.com/clabrugere/pytorch-scarf.git```
+
+or install from the repo
+
+```pip install git+https://github.com/clabrugere/pytorch-scarf.git```
+
 # Usage
 
 ``` python
