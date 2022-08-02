@@ -2,13 +2,83 @@
 
 Implementation of [SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption](https://arxiv.org/abs/2106.15147) in Pytorch.
 
+It learns a representation of tabular data using contrastive learning. It is inspired from SimCLR as it uses the same architecture and loss.
+
 # Install
 
 # Usage
 
+``` python
+from scarf.loss import NTXent
+from scarf.model import SCARF
+
+
+# preprocess your data and create your pytorch dataset
+# ...
+
+# train the model
+batch_size = 128
+epochs = 5000
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+
+model = SCARF(
+    input_dim=train_ds.shape[1],
+    emb_dim=16,
+    corruption_rate=0.5,
+).to(device)
+optimizer = Adam(model.parameters(), lr=0.001)
+ntxent_loss = NTXent()
+
+for epoch in range(1, epochs + 1):
+  for x_1, x_2 in train_loader:
+        x_1, x_2 = x_1.to(device), x_2.to(device)
+
+        # reset gradients
+        optimizer.zero_grad()
+
+        # get embeddings
+        emb, emb_corrupted = model(x_1, x_2)
+
+        # compute loss
+        loss = criterion(emb, emb_corrupted)
+        loss.backward()
+
+        # update model weights
+        optimizer.step()
+```
+
 # Parameters
 
+Model:
+
+- `input_dim` (int): dimension of a sample
+- `emb_dim` (int): dimension of the embedding vector
+- `encoder_depth` (int): number of layers in the encoder MLP. Defaults to 4
+- `head_depth` (int): number of layers in the pre-training head. Defaults to 2
+- `corruption_rate` (float): fraction of features to corrupt. Defaults to 0.6
+- `encoder` (nn.Module): encoder network. Defaults to None
+- `pretraining_head`(nn.Module): pre-training head network. Defaults to None
+
+
+NT-Xent loss:
+
+- `temperature` (float):
+
 # SCARF
+
+![Architecture](resources/architecture.png)
+
+This model builds embeddings of tabular data in a self-supervised fashion similarly to SimCLR using a contrastive approach.
+
+For each sample (anchor) in a batch of size N, a positive view is synthetically built by corrupting from the anchor a fixed amount of features drawn randomly each time, hence giving a final batch of size 2N.
+
+The corruption is made by simply replacing feature's values by the one observed in another sample that is drawn randomly. There is no explicitly defined negative views, but instead the procedure considers the 2(N - 1) other examples in the batch as negative views.
+
+An network `f`, the encoder, learns a representation of the anchor and positive view that is then fed to a projection head `g`that is not used to generate the embeddings.
+
+The learning procedure is about maximizing similarity between the anchor and the positive sample using NT-Xent loss from SimCLR. The similarity used is the cosine similarity.
 
 # Citations
 
