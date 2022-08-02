@@ -49,6 +49,8 @@ for epoch in range(1, epochs + 1):
         optimizer.step()
 ```
 
+For more details, refer to the example notebook `example/example.ipynb` and how to supply samples to the model in `example/dataset.py`
+
 # Parameters
 
 Model:
