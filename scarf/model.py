@@ -30,11 +30,10 @@ class SCARF(nn.Module):
         encoder=None,
         pretraining_head=None,
     ):
-        """Implementation of SCARF: Self-Supervised Contrastive Learning using Random
-        Feature Corruption. It consists in an encoder that learns the embeddings. It is done
-        by minimizing the contrastive loss of a sample and a corrupted view of it.
-        The corrupted view is built by remplacing a random set of features by another sample
-        randomly drawn independently.
+        """Implementation of SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption.
+        It consists in an encoder that learns the embeddings.
+        It is done by minimizing the contrastive loss of a sample and a corrupted view of it.
+        The corrupted view is built by remplacing a random set of features by another sample randomly drawn independently.
 
             Args:
                 input_dim (int): size of the inputs
@@ -81,7 +80,7 @@ class SCARF(nn.Module):
 
         x_corrupted = torch.where(corruption_mask, positive_sample, input)
 
-        # get embeddings
+        # compute embeddings
         embeddings = self.encoder(input)
         embeddings = self.pretraining_head(embeddings)
 

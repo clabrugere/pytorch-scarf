@@ -1,10 +1,11 @@
 import random
 
+import numpy as np
 import torch
 from tqdm.auto import tqdm
 
 
-def train_epoch(model, criterion, device, train_loader, optimizer, epoch):
+def train_epoch(model, criterion, train_loader, optimizer, device, epoch):
     model.train()
     epoch_loss = 0.0
     batch = tqdm(train_loader, desc=f"Epoch {epoch}", leave=False)
@@ -32,7 +33,22 @@ def train_epoch(model, criterion, device, train_loader, optimizer, epoch):
     return epoch_loss / len(train_loader.dataset)
 
 
+def dataset_embeddings(model, loader, device):
+    model.eval()
+    embeddings = []
+
+    with torch.no_grad():
+        for x_1, _ in tqdm(loader):
+            x_1 = x_1.to(device)
+            embeddings.append(model.get_embeddings(x_1))
+
+    embeddings = torch.cat(embeddings).numpy()
+
+    return embeddings
+
+
 def fix_seed(seed):
     random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
