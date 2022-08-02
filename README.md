@@ -2,7 +2,7 @@
 
 Implementation of [SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption](https://arxiv.org/abs/2106.15147) in Pytorch.
 
-It learns a representation of tabular data using contrastive learning. It is inspired from SimCLR as it uses the same architecture and loss.
+The model learns a representation of tabular data using contrastive learning. It is inspired from SimCLR and uses a similar architecture and loss.
 
 # Install
 
