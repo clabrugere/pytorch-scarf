@@ -14,7 +14,7 @@ from scarf.model import SCARF
 
 
 # preprocess your data and create your pytorch dataset
-# ...
+# train_ds = ...
 
 # train the model
 batch_size = 128
@@ -32,14 +32,14 @@ optimizer = Adam(model.parameters(), lr=0.001)
 ntxent_loss = NTXent()
 
 for epoch in range(1, epochs + 1):
-  for x_1, x_2 in train_loader:
-        x_1, x_2 = x_1.to(device), x_2.to(device)
+  for anchor, positive in train_loader:
+        anchor, positive = anchor.to(device), positive.to(device)
 
         # reset gradients
         optimizer.zero_grad()
 
         # get embeddings
-        emb, emb_corrupted = model(x_1, x_2)
+        emb, emb_corrupted = model(anchor, positive)
 
         # compute loss
         loss = criterion(emb, emb_corrupted)

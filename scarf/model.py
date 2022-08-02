@@ -66,28 +66,28 @@ class SCARF(nn.Module):
             torch.nn.init.xavier_uniform_(module.weight)
             module.bias.data.fill_(0.01)
 
-    def forward(self, input, positive_sample):
-        batch_size, m = input.size()
+    def forward(self, anchor, random_sample):
+        batch_size, m = anchor.size()
 
         # 1: create a mask of size (batch size, m) where for each sample we set the
         # jth column to True at random, such that corruption_len / m = corruption_rate
         # 3: replace x_1_ij by x_2_ij where mask_ij is true to build x_corrupted
 
-        corruption_mask = torch.zeros_like(input, dtype=torch.bool)
+        corruption_mask = torch.zeros_like(anchor, dtype=torch.bool)
         for i in range(batch_size):
             corruption_idx = torch.randperm(m)[: self.corruption_len]
             corruption_mask[i, corruption_idx] = True
 
-        x_corrupted = torch.where(corruption_mask, positive_sample, input)
+        positive = torch.where(corruption_mask, random_sample, anchor)
 
         # compute embeddings
-        embeddings = self.encoder(input)
-        embeddings = self.pretraining_head(embeddings)
+        emb_anchor = self.encoder(anchor)
+        emb_anchor = self.pretraining_head(emb_anchor)
 
-        embeddings_corrupted = self.encoder(x_corrupted)
-        embeddings_corrupted = self.pretraining_head(embeddings_corrupted)
+        emb_positive = self.encoder(positive)
+        emb_positive = self.pretraining_head(emb_positive)
 
-        return embeddings, embeddings_corrupted
+        return emb_anchor, emb_positive
 
     def get_embeddings(self, input):
         return self.encoder(input)
