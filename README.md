@@ -50,7 +50,7 @@ for epoch in range(1, epochs + 1):
         emb, emb_corrupted = model(anchor, positive)
 
         # compute loss
-        loss = criterion(emb, emb_corrupted)
+        loss = ntxent_loss(emb, emb_corrupted)
         loss.backward()
 
         # update model weights
