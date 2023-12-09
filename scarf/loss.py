@@ -34,7 +34,7 @@ class NTXent(nn.Module):
         sim_ji = torch.diag(similarity, -batch_size)
         positives = torch.cat([sim_ij, sim_ji], dim=0)
 
-        mask = (~torch.eye(batch_size * 2, batch_size * 2, dtype=torch.bool)).float()
+        mask = (~torch.eye(batch_size * 2, batch_size * 2, dtype=torch.bool, device=z_i.device)).float()
         numerator = torch.exp(positives / self.temperature)
         denominator = mask * torch.exp(similarity / self.temperature)
 

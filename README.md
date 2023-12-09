@@ -34,47 +34,37 @@ train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 model = SCARF(
     input_dim=train_ds.shape[1],
     emb_dim=16,
-    corruption_rate=0.5,
+    features_low=train_ds.features_low,
+    features_high=train_ds.features_high,
+    corruption_rate=0.6,
+    dropout=0.1
 ).to(device)
-optimizer = Adam(model.parameters(), lr=0.001)
+
+optimizer = Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
 ntxent_loss = NTXent()
 
+loss_history = []
+
 for epoch in range(1, epochs + 1):
-  for anchor, positive in train_loader:
-        anchor, positive = anchor.to(device), positive.to(device)
+    epoch_loss = 0.0
+    for x in train_loader:
+        x = x.to(device)
+        emb_anchor, emb_positive = model(x)
 
-        # reset gradients
-        optimizer.zero_grad()
-
-        # get embeddings
-        emb, emb_corrupted = model(anchor, positive)
-
-        # compute loss
-        loss = ntxent_loss(emb, emb_corrupted)
+        loss = criterion(emb_anchor, emb_positive)
         loss.backward()
 
-        # update model weights
         optimizer.step()
+        optimizer.zero_grad()
+        epoch_loss += loss.item()
+
+  loss_history.append(epoch_loss)
+
+  if epoch % 100 == 0:
+    print(f"epoch {epoch}/{epochs} - loss: {loss_history[-1]:.4f}")
 ```
 
 For more details, refer to the example notebook `example/example.ipynb` and how to supply samples to the model in `example/dataset.py`
-
-# Parameters
-
-Model:
-
-- `input_dim` (int): dimension of a sample
-- `emb_dim` (int): dimension of the embedding vector
-- `encoder_depth` (int): number of layers in the encoder MLP. Defaults to 4
-- `head_depth` (int): number of layers in the pre-training head. Defaults to 2
-- `corruption_rate` (float): fraction of features to corrupt. Defaults to 0.6
-- `encoder` (nn.Module): encoder network. Defaults to None
-- `pretraining_head`(nn.Module): pre-training head network. Defaults to None
-
-
-NT-Xent loss:
-
-- `temperature` (float):
 
 # SCARF
 
