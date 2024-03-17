@@ -68,7 +68,7 @@ For more details, refer to the example notebook `example/example.ipynb` and how 
 
 # SCARF
 
-![Architecture](resources/architecture.png)
+![Architecture](assets/architecture.png)
 
 This model builds embeddings of tabular data in a self-supervised fashion similarly to SimCLR using a contrastive approach.
 

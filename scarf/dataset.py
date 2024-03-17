@@ -1,10 +1,9 @@
 import numpy as np
-import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
 
-class ExampleDataset(Dataset):
+class SCARFDataset(Dataset):
     def __init__(self, data, target, columns=None):
         self.data = np.array(data)
         self.target = np.array(target)
@@ -23,10 +22,7 @@ class ExampleDataset(Dataset):
         return self.data.shape
 
     def __getitem__(self, index):
-        return torch.tensor(self.data[index], dtype=torch.float)
+        return torch.tensor(self.data[index], dtype=torch.float32)
 
     def __len__(self):
         return len(self.data)
-
-    def to_dataframe(self):
-        return pd.DataFrame(self.data, columns=self.columns)

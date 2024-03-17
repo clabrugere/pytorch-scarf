@@ -5,6 +5,17 @@ import torch
 from tqdm.auto import tqdm
 
 
+def get_device():
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+
+    return device
+
+
 def train_epoch(model, criterion, train_loader, optimizer, device):
     model.train()
     epoch_loss = 0.0
